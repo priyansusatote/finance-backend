@@ -7,6 +7,7 @@ import com.priyansu.finance_backend.enums.Role;
 import com.priyansu.finance_backend.enums.UserStatus;
 import com.priyansu.finance_backend.repository.UserRepository;
 import com.priyansu.finance_backend.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public UserResponse createUser(CreateUserRequest request) {
 
         if (userRepository.findByEmail(request.email()).isPresent()) {
@@ -50,6 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void updateUserStatus(Long userId, String status) {
         User user = userRepository.findById(userId)

@@ -8,6 +8,7 @@ import com.priyansu.finance_backend.enums.RecordType;
 import com.priyansu.finance_backend.repository.FinancialRecordRepository;
 import com.priyansu.finance_backend.repository.UserRepository;
 import com.priyansu.finance_backend.service.FinancialRecordService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public FinancialRecordResponse createRecord(FinancialRecordRequest request) {
 
@@ -67,6 +69,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteRecord(Long id) {
         FinancialRecord record = recordRepository.findById(id)
