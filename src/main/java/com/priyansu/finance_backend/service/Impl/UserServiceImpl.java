@@ -5,6 +5,9 @@ import com.priyansu.finance_backend.dto.UserResponse;
 import com.priyansu.finance_backend.entity.User;
 import com.priyansu.finance_backend.enums.Role;
 import com.priyansu.finance_backend.enums.UserStatus;
+import com.priyansu.finance_backend.exception.BadRequestException;
+import com.priyansu.finance_backend.exception.DuplicateResourceException;
+import com.priyansu.finance_backend.exception.ResourceNotFoundException;
 import com.priyansu.finance_backend.repository.UserRepository;
 import com.priyansu.finance_backend.service.UserService;
 import jakarta.transaction.Transactional;
@@ -25,7 +28,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(CreateUserRequest request) {
 
         if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException("Email already exists");
         }
 
         User user = User.builder()
@@ -56,13 +59,13 @@ public class UserServiceImpl implements UserService {
     @PreAuthorize("hasRole('ADMIN')")
     public void updateUserStatus(Long userId, String status) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         //for Safe ENUM conversion
         try {
             user.setStatus(UserStatus.valueOf(status));
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid status value");
+            throw new BadRequestException("Invalid status value");
         }
 
         userRepository.save(user);
@@ -73,12 +76,12 @@ public class UserServiceImpl implements UserService {
     public void updateUserRole(Long userId, String role) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         try {
             user.setRole(Role.valueOf(role));
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid role value");
+            throw new BadRequestException("Invalid role value");
         }
 
         userRepository.save(user);

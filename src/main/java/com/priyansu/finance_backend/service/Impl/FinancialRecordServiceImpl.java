@@ -5,6 +5,8 @@ import com.priyansu.finance_backend.dto.FinancialRecordResponse;
 import com.priyansu.finance_backend.entity.FinancialRecord;
 import com.priyansu.finance_backend.entity.User;
 import com.priyansu.finance_backend.enums.RecordType;
+import com.priyansu.finance_backend.exception.BadRequestException;
+import com.priyansu.finance_backend.exception.ResourceNotFoundException;
 import com.priyansu.finance_backend.repository.FinancialRecordRepository;
 import com.priyansu.finance_backend.repository.UserRepository;
 import com.priyansu.finance_backend.service.FinancialRecordService;
@@ -31,10 +33,10 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
 
         // TEMP: assign dummy user (later from auth)
         User user = userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (request.amount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Amount must be positive");
+            throw new ResourceNotFoundException("Amount must be positive");
         }
 
         //for safe-enum handling
@@ -42,7 +44,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
         try {
             type = RecordType.valueOf(request.type());
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid record type");
+            throw new BadRequestException("Invalid record type");
         }
 
         FinancialRecord record = FinancialRecord.builder()
@@ -73,7 +75,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteRecord(Long id) {
         FinancialRecord record = recordRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Record not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
 
         recordRepository.delete(record);
     }
