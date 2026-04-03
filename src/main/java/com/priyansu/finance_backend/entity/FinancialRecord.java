@@ -4,6 +4,7 @@ import com.priyansu.finance_backend.enums.RecordType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -19,7 +20,7 @@ public class FinancialRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double amount;
+    private BigDecimal amount;  //BigDecimal :to ensure accurate financial calculations
 
     @Enumerated(EnumType.STRING)
     private RecordType type;
