@@ -64,7 +64,7 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @Override
     @PreAuthorize("hasAnyRole('ADMIN' , 'ANALYST')")
     public List<FinancialRecordResponse> getAllRecords() {
-        return recordRepository.findAll()
+        return recordRepository.findByDeletedFalse()  //find only non-deleted
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -74,10 +74,12 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteRecord(Long id) {
-        FinancialRecord record = recordRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
+        FinancialRecord record = recordRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Record not found or Already Deleted"));
 
-        recordRepository.delete(record);
+
+        record.setDeleted(true); //soft-delete
+        recordRepository.save(record);
     }
 
     private FinancialRecordResponse mapToResponse(FinancialRecord record) {

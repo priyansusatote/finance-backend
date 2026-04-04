@@ -31,6 +31,8 @@ public class FinancialRecord {
 
     private String note;
 
+    private boolean deleted = false;  //for soft-delete
+
     @ManyToOne //Many records can be belong to one user
     @JoinColumn(name = "user_id")
     private User createdBy;
