@@ -17,10 +17,7 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
-    @GetMapping("/whoami")
-    public String whoami(Authentication auth) {
-        return auth.getAuthorities().toString();
-    }
+
 
     @PreAuthorize("hasAnyRole('ADMIN', 'ANALYST')")
     @GetMapping("/summary")
