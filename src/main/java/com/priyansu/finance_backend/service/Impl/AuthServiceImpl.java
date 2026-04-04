@@ -8,6 +8,7 @@ import com.priyansu.finance_backend.repository.UserRepository;
 import com.priyansu.finance_backend.security.JwtService;
 import com.priyansu.finance_backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +17,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public String login(LoginRequest request) {
@@ -23,8 +25,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // TEMP: plain password (later BCrypt)
-        if (!user.getPassword().equals(request.password())) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new BadRequestException("Invalid credentials");
         }
 

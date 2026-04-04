@@ -13,6 +13,7 @@ import com.priyansu.finance_backend.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -34,7 +36,7 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .name(request.name())
                 .email(request.email().toLowerCase())
-                .password(request.password()) //later will hash by Bcrypt
+                .password(passwordEncoder.encode(request.password())) //hash by Bcrypt
                 .role(Role.VIEWER)  //Default new user
                 .status(UserStatus.ACTIVE)
                 .build();
