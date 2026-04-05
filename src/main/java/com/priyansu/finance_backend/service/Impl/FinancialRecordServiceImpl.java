@@ -9,10 +9,13 @@ import com.priyansu.finance_backend.exception.BadRequestException;
 import com.priyansu.finance_backend.exception.ResourceNotFoundException;
 import com.priyansu.finance_backend.repository.FinancialRecordRepository;
 import com.priyansu.finance_backend.repository.UserRepository;
+import com.priyansu.finance_backend.security.JwtService;
 import com.priyansu.finance_backend.service.FinancialRecordService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,14 +28,16 @@ public class FinancialRecordServiceImpl implements FinancialRecordService {
 
     private final FinancialRecordRepository recordRepository;
     private final UserRepository userRepository;
+    private final JwtService jwtService;
+
 
     @Override
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public FinancialRecordResponse createRecord(FinancialRecordRequest request) {
 
-        // TEMP: assign dummy user (later from auth)
-        User user = userRepository.findById(1L)
+        String email = jwtService.getCurrentUserEmail();  //from securityContext
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (request.amount().compareTo(BigDecimal.ZERO) <= 0) {

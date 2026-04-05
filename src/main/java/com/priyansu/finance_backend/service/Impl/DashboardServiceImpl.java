@@ -23,7 +23,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public DashboardResponse getSummary() {
 
-        List<FinancialRecord> records = recordRepository.findAll();
+        List<FinancialRecord> records = recordRepository.findByDeletedFalse();
 
         BigDecimal totalIncome = BigDecimal.ZERO;
         BigDecimal totalExpense = BigDecimal.ZERO;
